@@ -1,0 +1,137 @@
+<!--Scripts
+<script src="https://cdn.jsdelivr.net/npm/jquery@2.2.4/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.4/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.1.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-match-height@0.7.2/dist/jquery.matchHeight.min.js"></script>
+<script src="../../assets/js/main.js"></script>
+&lt;!&ndash;  Chart js &ndash;&gt;
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>
+<script src="../../assets/js/init/chartjs-init.js"></script>
+&lt;!&ndash;Flot Chart&ndash;&gt;
+<script src="https://cdn.jsdelivr.net/npm/jquery.flot@0.8.3/jquery.flot.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flot-spline@0.0.1/js/jquery.flot.spline.min.js"></script>-->
+<style>
+    #date {
+        width: 100px;
+    }
+
+    .btn {
+        border: none;
+        color: white;
+        padding: 3px 20px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    #date option {
+        width: 100px;
+    }
+
+    .div-inline {
+
+        display: inline-block;
+    }
+
+</style>
+<script>
+
+</script>
+<div class="content">
+    <div class="animated fadeIn">
+        <div class="row">
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Revenu vs Depense annuelle <!--{{currentDate | date:'yyyy-MM-dd '}}-->
+                        </h4>
+
+                        <!--<div><form [formGroup] = "filterform">
+                          <select name="singleSelect" ng-model="data.singleSelect">
+                            <option value="2014"> 2014</option>
+                            <option value="2015"> 2015</option>
+                            <option value="2016"> 2016</option>
+                            <option value="2017"> 2017</option>
+                            <option value="2018"> 2018</option>
+                            <option value="2019"> 2019</option>
+                          </select>
+                          <button (click)="getDepenseParAnnee()"
+                                  [disabled]="filterform.controls.date1.valueOf()>
+                                     filterform.controls.date2.valueOf()">filtrer</button>
+                        </form></div>-->
+                        <canvas id="DepenseParAnnee"></canvas>
+
+                    </div>
+                </div>
+            </div><!-- /# column -->
+
+
+            <!--<div class="col-lg-6">
+              <div class="card">
+                <div class="card-body">
+                  <h4 class="mb-3">Revenue en fonction des Clients </h4>
+                  <canvas id="EvoClientRev"></canvas>
+                </div>
+              </div>
+            </div>-->
+
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="mb-3">Evolution des Clients </h4>
+                        <canvas id="EvoClient"></canvas>
+                    </div>
+                </div>
+            </div><!-- /# column -->
+
+
+            <div class="col-lg-12">
+                <div class="card">
+                    <p> &nbsp;&nbsp; choisir 2 dates</p>
+                    <div>
+                        <form [formGroup]="filterform">
+                            <select formControlName="date1">
+                                <option *ngFor="let dt of DateDep" value={{dt.dated}}>
+                                    {{dt.dated}}
+                                </option>
+                            </select>&nbsp;
+                            <select formControlName="date2">
+                                <option *ngFor="let dt of DateDep" value={{dt.dated}}>
+                                    {{dt.dated}}
+                                </option>
+                            </select>&nbsp;
+                            <button (click)="getdepenseParStationEtDate()"
+                                    [disabled]="filterform.controls.date1.value > filterform.controls.date2.value"
+                                    class="btn btn-primary">
+                                <i class="fa fa-search" aria-hidden="true"></i> &nbsp; filtrer date
+                            </button>
+                        </form>
+                        <br>
+                        &nbsp;&nbsp;<button class="btn btn-info" (click)="getDebitCreditDetail()">
+                        <i class="fa fa-download" aria-hidden="true"> </i>&nbsp; Exporter Detail Depenses
+                    </button>
+                    </div>
+
+                    <div class="card-body">
+                        <h4 class="mb-3">Types de Depenses </h4>
+
+                        <canvas id="depenseParStationEtDate" style="height: 360px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- /# column -->
+
+
+
+        </div>
+
+    </div><!-- .animated -->
+</div>
+<!-- /.content -->
+<!--Local Stuff-->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@1.5.3/dist/jspdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartist-plugin-legend@0.6.2/chartist-plugin-legend.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.7.3/dist/Chart.bundle.min.js"></script>

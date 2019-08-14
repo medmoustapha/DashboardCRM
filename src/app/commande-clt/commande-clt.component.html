@@ -1,0 +1,283 @@
+<script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+  .btn {
+    border: none;
+    color: white;
+    padding: 3px 20px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+
+  /* Darker background on mouse-over */
+  .btn:hover {
+    background-color: RoyalBlue;
+  }
+</style>
+<div class="content">
+  <!-- Animated -->
+
+  <div class="orders">
+    <div class="row">
+      <div class="col-xl-12">
+        <div class="card">
+          <p> &nbsp;&nbsp; choisir 2 dates</p>
+          <div class="after-box">
+
+            <form [formGroup]="filterform">
+              &nbsp;&nbsp;<select formControlName="date1">
+              <option *ngFor="let dt of DateCmdClte" value={{dt.dated}}>
+                {{dt.dated}}
+              </option>
+            </select>&nbsp;&nbsp;
+              <select formControlName="date2">
+                <option *ngFor="let dt of DateCmdClte" value={{dt.dated}}>
+                  {{dt.dated}}
+                </option>
+              </select>&nbsp;&nbsp;
+              <button (click)="getCmdClt()"
+                      [disabled]="filterform.controls.date1.value >
+                         filterform.controls.date2.value" class="btn btn-primary">
+                <i class="fa fa-search" aria-hidden="true"></i> &nbsp; filtrer date
+              </button>
+            </form><br>
+            &nbsp;&nbsp;<button   class="btn btn-warning" (click)="GenerateCSV()" style="float: center;" style="font-size:16px">
+                <i class="fa fa-download" aria-hidden="true"> </i> &nbsp; Telecharger detail</button>
+            <br></div>
+          <div class="card-body" >
+            <h4 class="box-title"class="text-center" ><strong>Les Dernières Commandes Clients</strong></h4>
+          </div>
+          <div class="card-body--" >
+            <mat-form-field fxFlex="40%">
+              <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder=" Chercher ">
+            </mat-form-field>
+            <div class="table-stats order-table ov-h">
+              <table mat-table #table [dataSource]="dataSource" matSort class="table">
+                <!-- Id Column -->
+
+                <ng-container matColumnDef="nomPrenomTier">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>NomPrenomTier</strong></th>
+                  <td mat-cell *matCellDef="let element"> {{element.nomPrenomTier}} </td>
+                </ng-container>
+
+                <!-- Title Column -->
+                <ng-container matColumnDef="numordre">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Num-ordre</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.numordre}} </td>
+                </ng-container>
+
+                <!-- Category Column -->
+                <ng-container matColumnDef="idDocument">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Id-Document</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.idDocument}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="codeArticle">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Code-Article </strong></th>
+                  <td mat-cell *matCellDef="let element"> {{element.codeArticle}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="libelleArticle">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Libelle-Article</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.libelleArticle}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="qte">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Qte</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.qte}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="puht">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Puht</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.puht}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="puttc">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Puttc</strong> </th>
+                <td mat-cell *matCellDef="let element"> {{element.puttc}} </td>
+              </ng-container>
+
+                <ng-container matColumnDef="mntttc">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Mntttc</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.mntttc}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="mntTv">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>MntTv</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.mntTv}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="dateligne">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header class="p-3 mb-2 bg-secondary text-white">
+                    <strong>Date-ligne</strong> </th>
+                  <td mat-cell *matCellDef="let element"> {{element.dateligne}} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+              </table>
+              <mat-paginator [pageSizeOptions]="[7, 12, 20]" showFirstLastButtons></mat-paginator>
+            </div> <!-- /.table-stats -->
+          </div>
+        </div> <!-- /.card -->
+      </div>  <!-- /.col-lg-8 -->
+
+      <!-- <div class="col-xl-4">
+         <div class="row">
+           <div class="col-lg-6 col-xl-12">
+             <div class="card br-0">
+               <div class="card-body">
+                 <h5 class="box-title" class="text-center">Top 14 Best Client </h5>
+                 <div class="card-body">
+                   <div class="table-stats order-table ov-h">
+                     <table class="table ">
+                       <thead>
+                       <tr>
+                         <th>Nom Client</th>
+                         <th>Montant</th>
+                       </tr>
+                       </thead>
+                       <tbody>
+                       <tr *ngFor="let topC of TopClient">
+                         <td>{{ topC.client}}</td>
+                         <td>{{ topC.montant }}</td>
+
+                       </tr>
+                       </tbody>
+                     </table>
+                   </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+
+                 </div>
+               </div>&lt;!&ndash; /.card &ndash;&gt;
+             </div>
+
+             <div class="col-lg-6 col-xl-12">
+               <div class="card bg-flat-color-3  ">
+                 &lt;!&ndash;<div class="card-body">
+                   <h4 class="card-title m-0  white-color ">August 2018</h4>
+                 </div>
+                 <div class="card-body">
+                   <div id="flotLine5" class="flot-line"></div>
+                 </div>&ndash;&gt;
+               </div>
+             </div>
+           </div>
+         </div> &lt;!&ndash; /.col-md-4 &ndash;&gt;
+       </div>-->
+    </div>
+
+  </div>
+
+
+  <!-- <div class="orders">
+     <div class="row">
+       <div class="col-xl-12">
+         <div class="card">
+           <div class="card-body" >
+             <h4 class="box-title"class="text-center">MvDocuments Non regler </h4>
+           </div>
+           <div class="card-body&#45;&#45;" >
+             <mat-form-field fxFlex="40%">
+               <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filtrer">
+             </mat-form-field><p>
+             <button class="fa fa-download"   class="btn"(click)="GenerateCSV()" style="float: center;">Telecharger detail</button>
+           </p>
+             <div class="table-stats order-table ov-h">
+               <table mat-table #table [dataSource]="dataSource" matSort class="table">
+                 &lt;!&ndash; Id Column &ndash;&gt;
+
+                 <ng-container matColumnDef="commercial">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header> commercial </th>
+                   <td mat-cell *matCellDef="let element"> {{element.commercial}} </td>
+                 </ng-container>
+
+                 &lt;!&ndash; Title Column &ndash;&gt;
+                 <ng-container matColumnDef="mntRegler">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header> mntRegler </th>
+                   <td mat-cell *matCellDef="let element"> {{element.mntRegler}} </td>
+                 </ng-container>
+
+                 &lt;!&ndash; Category Column &ndash;&gt;
+                 <ng-container matColumnDef="dateDocument">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header> Prix dateDocument </th>
+                   <td mat-cell *matCellDef="let element"> {{element.dateDocument}} </td>
+                 </ng-container>
+
+                 <ng-container matColumnDef="codeArticle">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header> codeArticle </th>
+                   <td mat-cell *matCellDef="let element"> {{element.codeArticle}} </td>
+                 </ng-container>
+
+                 <ng-container matColumnDef="libelleArticle">
+                   <th mat-header-cell *matHeaderCellDef mat-sort-header> libelleArticle </th>
+                   <td mat-cell *matCellDef="let element"> {{element.libelleArticle}} </td>
+                 </ng-container>
+
+                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+               </table>
+               <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+             </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+           </div>
+         </div> &lt;!&ndash; /.card &ndash;&gt;
+       </div>  &lt;!&ndash; /.col-lg-8 &ndash;&gt;
+
+       &lt;!&ndash; <div class="col-xl-4">
+          <div class="row">
+            <div class="col-lg-6 col-xl-12">
+              <div class="card br-0">
+                <div class="card-body">
+                  <h5 class="box-title" class="text-center">Top 14 Best Client </h5>
+                  <div class="card-body">
+                    <div class="table-stats order-table ov-h">
+                      <table class="table ">
+                        <thead>
+                        <tr>
+                          <th>Nom Client</th>
+                          <th>Montant</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr *ngFor="let topC of TopClient">
+                          <td>{{ topC.client}}</td>
+                          <td>{{ topC.montant }}</td>
+
+                        </tr>
+                        </tbody>
+                      </table>
+                    </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+
+                  </div>
+                </div>&lt;!&ndash; /.card &ndash;&gt;
+              </div>
+
+              <div class="col-lg-6 col-xl-12">
+                <div class="card bg-flat-color-3  ">
+                  &lt;!&ndash;<div class="card-body">
+                    <h4 class="card-title m-0  white-color ">August 2018</h4>
+                  </div>
+                  <div class="card-body">
+                    <div id="flotLine5" class="flot-line"></div>
+                  </div>&ndash;&gt;
+                </div>
+              </div>
+            </div>
+          </div> &lt;!&ndash; /.col-md-4 &ndash;&gt;
+        </div>&ndash;&gt;
+     </div>
+
+   </div>-->
+
+</div>
+<script src="assets/js/main.js"></script>
+

@@ -1,0 +1,154 @@
+<script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .btn {
+        background-color: DodgerBlue;
+        border: none;
+        color: white;
+        padding: 3px 20px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .positive {
+        background-color: #49cf6f;
+    }
+
+    .negative {
+        background-color: #ff445e;
+    }
+
+    .alert {
+        background-color: #ffb714;
+    }
+
+    /* Darker background on mouse-over */
+    .btn:hover {
+        background-color: RoyalBlue;
+    }
+</style>
+<div class="content">
+    <!-- Animated -->
+
+    <div class="orders">
+        <div class="row">
+            <div class="col-xl-10">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="box-title" class="text-center">Liste Des Produits en Stock </h3>
+                    </div>
+                    <div class="card-body--">
+                        <mat-form-field fxFlex="40%">
+                            <input matInput type="text" (keyup)="doFilter($event.target.value)"
+                                   placeholder=" Chercher ">
+                        </mat-form-field>
+                        <p>
+                            <button class="btn" (click)="GenerateCSV()" style="float: center;" style="font-size:16px">
+                                <i class="fa fa-download" aria-hidden="true"> </i>&nbsp; Exporter
+                            </button>
+                        </p>
+                        <div class="table-stats order-table ov-h">
+                            <table mat-table #table [dataSource]="dataSource" matSort class="table">
+                                <!-- Id Column -->
+                                <ng-container matColumnDef="Libellearticle">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-secondary text-white">
+                                        <h4>libelle article</h4></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.libelleArticle}} </td>
+                                </ng-container>
+
+                                <!-- Title Column -->
+                                <ng-container matColumnDef="Quantite">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-secondary text-white">
+                                        <h4>Quantite</h4></th>
+                                    <td mat-cell *matCellDef="let element"
+                                        [ngClass]="{
+            'positive' : element.qte >= 800,
+            'negative' : element.qte <= 480,
+            'alert' : element.qte >=500 && element.qte <800
+
+         }"> {{element.qte}} </td>
+                                </ng-container>
+
+                                <!-- Category Column -->
+                                <ng-container matColumnDef="PrixventeHt">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-secondary text-white">
+                                        <h4>Prix Vente Ht</h4></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.prixuVenteHt}} </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            </table>
+                            <mat-paginator [pageSizeOptions]="[7, 10, 20]" showFirstLastButtons></mat-paginator>
+                        </div> <!-- /.table-stats -->
+                    </div>
+                </div> <!-- /.card -->
+            </div>  <!-- /.col-lg-8 -->
+
+            <!--<div class="row">
+              <div class="col-lg-12">
+                <div class="card">
+                  <p> &nbsp;&nbsp; tes pie </p>
+
+
+                  <div class="card-body">
+                    <h4 class="mb-3"></h4>
+
+                    <canvas id="typeProd" ></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>-->
+
+            <!-- <div class="col-xl-4">
+               <div class="row">
+                 <div class="col-lg-6 col-xl-12">
+                   <div class="card br-0">
+                     <div class="card-body">
+                       <h5 class="box-title" class="text-center">Top 14 Best Client </h5>
+                       <div class="card-body">
+                         <div class="table-stats order-table ov-h">
+                           <table class="table ">
+                             <thead>
+                             <tr>
+                               <th>Nom Client</th>
+                               <th>Montant</th>
+                             </tr>
+                             </thead>
+                             <tbody>
+                             <tr *ngFor="let topC of TopClient">
+                               <td>{{ topC.client}}</td>
+                               <td>{{ topC.montant }}</td>
+
+                             </tr>
+                             </tbody>
+                           </table>
+                         </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+
+                       </div>
+                     </div>&lt;!&ndash; /.card &ndash;&gt;
+                   </div>
+
+                   <div class="col-lg-6 col-xl-12">
+                     <div class="card bg-flat-color-3  ">
+                       &lt;!&ndash;<div class="card-body">
+                         <h4 class="card-title m-0  white-color ">August 2018</h4>
+                       </div>
+                       <div class="card-body">
+                         <div id="flotLine5" class="flot-line"></div>
+                       </div>&ndash;&gt;
+                     </div>
+                   </div>
+                 </div>
+               </div> &lt;!&ndash; /.col-md-4 &ndash;&gt;
+             </div>-->
+        </div>
+
+    </div>
+
+</div>
+<script src="assets/js/main.js"></script>
+

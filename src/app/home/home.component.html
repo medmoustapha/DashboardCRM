@@ -1,0 +1,989 @@
+<script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js">
+</script>
+<style>
+    .btn-danger {
+
+        background-color: hsl(351, 68%, 11%) !important;
+
+        background-repeat: repeat-x;
+
+        background-image: -o-linear-gradient(top, #d12741, #2f080e);
+
+        background-image: linear-gradient(#d12741, #2f080e);
+
+        border-color: #2f080e #2f080e hsl(351, 68%, 1.5%);
+
+        color: #fff !important;
+
+        text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.62);
+
+    }
+
+    .btn {
+        border: none;
+        color: white;
+        padding: 3px 20px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    .after-box {
+
+        display: inline-block;
+    }
+
+    /* Darker background on mouse-over */
+    .btn:hover {
+        background-color: RoyalBlue;
+    }
+</style>
+<div class="content">
+    <!-- Animated -->
+    <div class="animated fadeIn">
+        <!-- Widgets  -->
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-1">
+                                <i class="pe-7s-cash"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text" class="text-success"> Dt
+                                        <span><strong> {{ ca }}</strong> </span></div>
+                                    <div class="stat-heading">Revenue</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-2">
+                                <i class="pe-7s-cart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text" class="text-info">Dt
+                                        <span><strong>{{nbVente}}</strong></span></div>
+                                    <div class="stat-heading"> Articles vendus</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-4">
+                                <i class="pe-7s-cash"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text" class="text-danger">Dt <span><strong>{{ depenses }}</strong> </span>
+                                    </div>
+                                    <div class="stat-heading">Les Depenses</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="stat-widget-five">
+                            <div class="stat-icon dib flat-color-4">
+                                <i class="pe-7s-users"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="text-left dib">
+                                    <div class="stat-text"><span>{{nbClient}}</span></div>
+                                    <div class="stat-heading">Clients</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Widgets -->
+        <!--  Traffic  -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <p> &nbsp;&nbsp; choisir 2 dates</p>
+                    <div class="after-box">
+
+                        <form [formGroup]="filterform">
+                            &nbsp;&nbsp;<select formControlName="date1">
+                            <option *ngFor="let dt of DatePvd" value={{dt.dated}}>
+                                {{dt.dated}}
+                            </option>
+                        </select>&nbsp;&nbsp;
+                            <select formControlName="date2">
+                                <option *ngFor="let dt of DatePvd" value={{dt.dated}}>
+                                    {{dt.dated}}
+                                </option>
+                            </select>&nbsp;&nbsp;
+                            <button (click)="getProduitVenduParDate()"
+                                    [disabled]="filterform.controls.date1.value >
+                         filterform.controls.date2.value" class="btn btn-primary">
+                                <i class="fa fa-search" aria-hidden="true"></i> &nbsp; filtrer date
+                            </button>
+                        </form>
+                        <br>
+                        &nbsp;&nbsp;<button class="btn btn-info" (click)="GenerateCSV1()">
+                        <i class="fa fa-download" aria-hidden="true"> </i>&nbsp; Exporter xlsx
+                    </button>
+
+                    </div>
+                    <div class="card-body">
+                        <h4 class="box-title">Statistique des Produits Vendus</h4>
+
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-8">
+                            <div class="card-body">
+                                <canvas id="ProduitVenduParDate"></canvas>
+                            </div>
+                        </div>
+                        <div class="col-lg-3">
+                            <h4 class="box-title" class="text-center"><strong>Top Produits Vendus</strong></h4>
+                            <div class="card-body--"><p></p>
+                                <div class="table-stats order-table ov-h">
+                                    <table class="table">
+                                        <thead class="bg-info text-white">
+                                        <tr class="bg-info text-white">
+                                            <th class="bg-info text-white">Produit</th>
+                                            <th class="bg-info text-white">quantité</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr *ngFor="let topP of topProduit">
+                                            <td>{{ topP.libelleFamille }}</td>
+                                            <td>{{ topP.Qtevendu }}</td>
+
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div> <!-- /.table-stats -->
+                            </div>
+                        </div>
+                        <!--<div class="card-body">
+                          <div class="progress-box progress-1">
+                            <h4 class="por-title">Visits</h4>
+                            <div class="por-txt">96,930 Users (60%)</div>
+                            <div class="progress mb-2" style="height: 5px;">
+                              <div class="progress-bar bg-flat-color-1" role="progressbar" style="width: 40%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                          <div class="progress-box progress-2">
+                            <h4 class="por-title">Bounce Rate</h4>
+                            <div class="por-txt">3,220 Users (24%)</div>
+                            <div class="progress mb-2" style="height: 5px;">
+                              <div class="progress-bar bg-flat-color-2" role="progressbar" style="width: 24%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                          <div class="progress-box progress-2">
+                            <h4 class="por-title">Unique Visitors</h4>
+                            <div class="por-txt">29,658 Users (60%)</div>
+                            <div class="progress mb-2" style="height: 5px;">
+                              <div class="progress-bar bg-flat-color-3" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                          <div class="progress-box progress-2">
+                            <h4 class="por-title">Targeted  Visitors</h4>
+                            <div class="por-txt">99,658 Users (90%)</div>
+                            <div class="progress mb-2" style="height: 5px;">
+                              <div class="progress-bar bg-flat-color-4" role="progressbar" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                          </div>
+                        </div>--> <!-- /.card-body -->
+                    </div>
+                </div> <!-- /.row -->
+                <div class="card-body"></div>
+            </div>
+        </div><!-- /# column -->
+    </div>
+    <!--  /Traffic -->
+    <div class="clearfix"></div>
+    <!-- Orders -->
+
+    <div class="orders">
+        <div class="row">
+            <div class="col-xl-8">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="box-title" class="text-center"><strong>Les Transactions Effectuées</strong></h4>
+                    </div>
+                    <p> &nbsp;&nbsp; choisir 2 dates</p>
+                    <div>
+
+                        <form [formGroup]="filterform">
+                            &nbsp;&nbsp;<select formControlName="date1">
+                            <option *ngFor="let dt of DatePvd" value={{dt.dated}}>
+                                {{dt.dated}}
+                            </option>
+                        </select>&nbsp;&nbsp;
+                            <select formControlName="date2">
+                                <option *ngFor="let dt of DatePvd" value={{dt.dated}}>
+                                    {{dt.dated}}
+                                </option>
+                            </select>&nbsp;&nbsp;
+                            <button (click)="getDebitCredit()"
+                                    [disabled]="filterform.controls.date1.value >
+                         filterform.controls.date2.value" class="btn btn-primary">
+                                <i class="fa fa-search" aria-hidden="true"></i> &nbsp; filtrer date
+                            </button>
+                        </form>
+                    </div>
+                    <div class="card-body">
+                        <mat-form-field>
+                            <input matInput type="text" (keyup)="doFilter($event.target.value)"
+                                   placeholder=" Chercher Banque ">
+                        </mat-form-field>
+                        &nbsp;<button (click)="GenerateCSV2()" style="font-size:16px" class="btn btn-danger">
+                        <i class="fa fa-download"> </i>&nbsp; Exporter
+                    </button>
+                        <div class="table-stats order-table ov-h">
+                            <table mat-table [dataSource]="dataSource" matSort class="table">
+                                <!-- Id Column -->
+
+                                <ng-container matColumnDef="idbanque">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong> Banque </strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.idbanque}} </td>
+                                </ng-container>
+                                <!-- Title Column -->
+                                <ng-container matColumnDef="debiter">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong>Debit</strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.debit}} </td>
+                                </ng-container>
+
+                                <!-- Category Column -->
+                                <ng-container matColumnDef="crediter">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong>Credit</strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.credit}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="type-reg">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong>Type-Reg</strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.TypeReg}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="date">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong>Date</strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.dateT}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="devise">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                        class="p-3 mb-2 bg-primary text-white">
+                                        <strong>Devise</strong></th>
+                                    <td mat-cell *matCellDef="let element"> {{element.idDevise}} </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            </table>
+                            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                        </div> <!-- /.table-stats -->
+                    </div>
+                </div> <!-- /.card -->
+            </div>  <!-- /.col-lg-8 -->
+
+            <div class="col-xl-4">
+                <div class="row">
+                    <div class="col-lg-6 col-xl-12">
+                        <div class="card br-0">
+                            <div class="card-body">
+                                <h4 class="box-title" class="text-center"><strong>Top 5 Best Client</strong></h4>
+                                <div class="card-body">
+                                    <div class="table-stats order-table ov-h">
+                                        <table mat-table [dataSource]="dataSource1" matSort class="table">
+                                            <!-- Id Column -->
+                                            <ng-container matColumnDef="client" class="bg-primary text-white">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    class="bg-info text-white"><h6>Client</h6></th>
+                                                <td mat-cell *matCellDef="let element"> {{element.client}} </td>
+                                            </ng-container>
+                                            <!-- Title Column -->
+                                            <ng-container matColumnDef="montant">
+                                                <th mat-header-cell *matHeaderCellDef mat-sort-header
+                                                    class="bg-info text-white"><h6>Montant</h6></th>
+                                                <td mat-cell *matCellDef="let element"> {{element.montant}} dt</td>
+                                            </ng-container>
+
+                                            <tr mat-header-row *matHeaderRowDef="displayedColumnsS"></tr>
+                                            <tr mat-row *matRowDef="let row; columns: displayedColumnsS;"></tr>
+                                        </table>
+                                        <mat-paginator [pageSizeOptions]="[5, 10, 20]"
+                                                       showFirstLastButtons></mat-paginator>
+                                    </div> <!-- /.table-stats -->
+
+                                </div>
+                            </div><!-- /.card -->
+                        </div>
+
+                        <div class="col-lg-6 col-xl-12">
+                            <div class="card bg-flat-color-3  ">
+                                <!--<div class="card-body">
+                                  <h4 class="card-title m-0  white-color ">August 2018</h4>
+                                </div>
+                                <div class="card-body">
+                                  <div id="flotLine5" class="flot-line"></div>
+                                </div>-->
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- /.col-md-4 -->
+            </div>
+        </div>
+
+    </div>
+
+    <script src="assets/js/main.js"></script>
+    <!--&lt;!&ndash;Local Stuff&ndash;&gt;-->
+    <!--<script>
+      jQuery(document).ready(function($) {
+        "use strict";
+
+        // Pie chart flotPie1
+        var piedata = [
+          { label: "Desktop visits", data: [[1,32]], color: '#5c6bc0'},
+          { label: "Tab visits", data: [[1,33]], color: '#ef5350'},
+          { label: "Mobile visits", data: [[1,35]], color: '#66bb6a'}
+        ];
+
+        $.plot('#flotPie1', piedata, {
+          series: {
+            pie: {
+              show: true,
+              radius: 1,
+              innerRadius: 0.65,
+              label: {
+                show: true,
+                radius: 2/3,
+                threshold: 1
+              },
+              stroke: {
+                width: 0
+              }
+            }
+          },
+          grid: {
+            hoverable: true,
+            clickable: true
+          }
+        });
+        // Pie chart flotPie1  End
+        // cellPaiChart
+       /* var cellPaiChart = [
+          { label: "Direct Sell", data: [[1,65]], color: '#5b83de'},
+          { label: "Channel Sell", data: [[1,35]], color: '#00bfa5'}
+        ];
+        $.plot('#cellPaiChart', cellPaiChart, {
+          series: {
+            pie: {
+              show: true,
+              stroke: {
+                width: 0
+              }
+            }
+          },
+          legend: {
+            show: true
+          },grid: {
+            hoverable: true,
+            clickable: true
+          }
+
+        });*/
+        // cellPaiChart End
+        // Line Chart  #flotLine5
+        var newCust = [[0, 3], [1, 5], [2,4], [3, 7], [4, 9], [5, 3], [6, 6], [7, 4], [8, 10]];
+
+        var plot = $.plot($('#flotLine5'),[{
+            data: newCust,
+            label: 'New Data Flow',
+            color: '#fff'
+          }],
+          {
+            series: {
+              lines: {
+                show: true,
+                lineColor: '#fff',
+                lineWidth: 2
+              },
+              points: {
+                show: true,
+                fill: true,
+                fillColor: "#ffffff",
+                symbol: "circle",
+                radius: 3
+              },
+              shadowSize: 0
+            },
+            points: {
+              show: true,
+            },
+            legend: {
+              show: false
+            },
+            grid: {
+              show: false
+            }
+          });
+        // Line Chart  #flotLine5 End
+        // Traffic Chart using chartist
+        if ($('#traffic-chart').length) {
+          var chart = new Chartist.Line('#traffic-chart', {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            series: [
+              [0, 18000, 35000,  25000,  22000,  0],
+              [0, 33000, 15000,  20000,  15000,  300],
+              [0, 15000, 28000,  15000,  30000,  5000]
+            ]
+          }, {
+            low: 0,
+            showArea: true,
+            showLine: false,
+            showPoint: false,
+            fullWidth: true,
+            axisX: {
+              showGrid: true
+            }
+          });
+
+          chart.on('draw', function(data) {
+            if(data.type === 'line' || data.type === 'area') {
+              data.element.animate({
+                d: {
+                  begin: 2000 * data.index,
+                  dur: 2000,
+                  from: data.path.clone().scale(1, 0).translate(0, data.chartRect.height()).stringify(),
+                  to: data.path.clone().stringify(),
+                  easing: Chartist.Svg.Easing.easeOutQuint
+                }
+              });
+            }
+          });
+        }
+        // Traffic Chart using chartist End
+        //Traffic chart chart-js
+      /*  if ($('#TrafficChart').length) {
+          var ctx = document.getElementById( "TrafficChart" );
+          ctx.height = 150;
+          var myChart = new Chart( ctx, {
+            type: 'line',
+            data: {
+              labels: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" ],
+              datasets: [
+                {
+                  label: "Visit",
+                  borderColor: "rgba(4, 73, 203,.09)",
+                  borderWidth: "1",
+                  backgroundColor: "rgba(4, 73, 203,.5)",
+                  data: [ 0, 2900, 5000, 3300, 6000, 3250, 0 ]
+                },
+                {
+                  label: "Bounce",
+                  borderColor: "rgba(245, 23, 66, 0.9)",
+                  borderWidth: "1",
+                  backgroundColor: "rgba(245, 23, 66,.5)",
+                  pointHighlightStroke: "rgba(245, 23, 66,.5)",
+                  data: [ 0, 4200, 4500, 1600, 4200, 1500, 4000 ]
+                },
+                {
+                  label: "Targeted",
+                  borderColor: "rgba(40, 169, 46, 0.9)",
+                  borderWidth: "1",
+                  backgroundColor: "rgba(40, 169, 46, .5)",
+                  pointHighlightStroke: "rgba(40, 169, 46,.5)",
+                  data: [1000, 5200, 3600, 2600, 4200, 5300, 0 ]
+                }
+              ]
+            },
+            options: {
+              responsive: true,
+              legend: {
+                display: true,
+                labels: {
+                  usePointStyle: true,
+                },
+              },
+              tooltips: {
+                mode: 'index',
+                intersect: false
+              },
+              hover: {
+                mode: 'nearest',
+                intersect: true
+              }
+
+            }
+          } );
+        }*/
+        //Traffic chart chart-js  End
+        // Bar Chart #flotBarChart
+        $.plot("#flotBarChart", [{
+          data: [[0, 18], [2, 8], [4, 5], [6, 13],[8,5], [10,7],[12,4], [14,6],[16,15], [18, 9],[20,17], [22,7],[24,4], [26,9],[28,11]],
+          bars: {
+            show: true,
+            lineWidth: 0,
+            fillColor: '#ffffff8a'
+          }
+        }], {
+          grid: {
+            show: false
+          }
+        });
+        // Bar Chart #flotBarChart End
+      });
+      jQuery(document).ready(function ($) {
+        "use strict";
+        //Team chart
+        var ctx = document.getElementById( "team-chart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'line',
+          data: {
+            labels: [ "2012", "2013", "2014", "2015", "2016", "2017", "2018" ],
+            type: 'line',
+            defaultFontFamily: 'Montserrat',
+            datasets: [ {
+              data: [ 0, 7, 3, 5, 2, 8, 6 ],
+              label: "Expense",
+              backgroundColor: 'rgba(0,200,155,.35)',
+              borderColor: 'rgba(0,200,155,0.60)',
+              borderWidth: 3.5,
+              pointStyle: 'circle',
+              pointRadius: 5,
+              pointBorderColor: 'transparent',
+              pointBackgroundColor: 'rgba(0,200,155,0.60)',
+            },
+              {
+                data: [ 0, 6, 3, 4, 3, 7, 10 ],
+                label: "Profit",
+                backgroundColor: 'rgba(0,194,146,.25)',
+                borderColor: 'rgba(0,194,146,0.5)',
+                borderWidth: 3.5,
+                pointStyle: 'circle',
+                pointRadius: 5,
+                pointBorderColor: 'transparent',
+                pointBackgroundColor: 'rgba(0,194,146,0.5)',
+              }, ]
+          },
+          options: {
+            responsive: true,
+            tooltips: {
+              mode: 'index',
+              titleFontSize: 12,
+              titleFontColor: '#000',
+              bodyFontColor: '#000',
+              backgroundColor: '#fff',
+              titleFontFamily: 'Montserrat',
+              bodyFontFamily: 'Montserrat',
+              cornerRadius: 3,
+              intersect: false,
+            },
+            legend: {
+              display: false,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                fontFamily: 'Montserrat',
+              },
+
+
+            },
+            scales: {
+              xAxes: [ {
+                display: true,
+                gridLines: {
+                  display: false,
+                  drawBorder: false
+                },
+                scaleLabel: {
+                  display: false,
+                  labelString: 'Month'
+                }
+              } ],
+              yAxes: [ {
+                display: true,
+                gridLines: {
+                  display: false,
+                  drawBorder: false
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Value'
+                }
+              } ]
+            },
+            title: {
+              display: false,
+            }
+          }
+        } );
+
+
+        //Sales chart
+        var ctx = document.getElementById( "sales-chart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'line',
+          data: {
+            labels: [ "2012", "2013", "2014", "2015", "2016", "2017", "2018" ],
+            type: 'line',
+            defaultFontFamily: 'Montserrat',
+            datasets: [ {
+              label: "Foods",
+              data: [ 0, 30, 15, 110, 50, 63, 120 ],
+              backgroundColor: 'transparent',
+              borderColor: 'rgba(220,53,69,0.75)',
+              borderWidth: 3,
+              pointStyle: 'circle',
+              pointRadius: 5,
+              pointBorderColor: 'transparent',
+              pointBackgroundColor: 'rgba(220,53,69,0.75)',
+            }, {
+              label: "Electronics",
+              data: [ 0, 50, 40, 80, 35, 99, 80 ],
+              backgroundColor: 'transparent',
+              borderColor: 'rgba(40,167,69,0.75)',
+              borderWidth: 3,
+              pointStyle: 'circle',
+              pointRadius: 5,
+              pointBorderColor: 'transparent',
+              pointBackgroundColor: 'rgba(40,167,69,0.75)',
+            } ,{
+              label: "mbourou",
+              data: [ 10, 50, 15, 30, 35, 60, 90 ],
+              backgroundColor: 'transparent',
+              borderColor: 'rgba(244, 208, 65)',
+              borderWidth: 3,
+              pointStyle: 'circle',
+              pointRadius: 5,
+              pointBorderColor: 'transparent',
+              pointBackgroundColor: 'rgba(244, 208, 65)',
+            } ]
+          },
+          options: {
+            responsive: true,
+
+            tooltips: {
+              mode: 'index',
+              titleFontSize: 12,
+              titleFontColor: '#000',
+              bodyFontColor: '#000',
+              backgroundColor: '#fff',
+              titleFontFamily: 'Montserrat',
+              bodyFontFamily: 'Montserrat',
+              cornerRadius: 3,
+              intersect: false,
+            },
+            legend: {
+              display: false,
+              labels: {
+                usePointStyle: true,
+                fontFamily: 'Montserrat',
+              },
+            },
+            scales: {
+              xAxes: [ {
+                display: true,
+                gridLines: {
+                  display: false,
+                  drawBorder: false
+                },
+                scaleLabel: {
+                  display: false,
+                  labelString: 'Month'
+                }
+              } ],
+              yAxes: [ {
+                display: true,
+                gridLines: {
+                  display: false,
+                  drawBorder: false
+                },
+                scaleLabel: {
+                  display: true,
+                  labelString: 'Value'
+                }
+              } ]
+            },
+            title: {
+              display: false,
+              text: 'Normal Legend'
+            }
+          }
+        } );
+
+
+
+
+
+
+
+        //line chart
+        var ctx = document.getElementById( "lineChart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'line',
+          data: {
+            labels: [ "January", "February", "March", "April", "May", "June", "July" ],
+            datasets: [
+              {
+                label: "My First dataset",
+                borderColor: "rgba(0,0,0,.09)",
+                borderWidth: "1",
+                backgroundColor: "rgba(0,0,0,.07)",
+                data: [ 20, 47, 35, 43, 65, 45, 35 ]
+              },
+              {
+                label: "My Second dataset",
+                borderColor: "rgba(0, 194, 146, 0.9)",
+                borderWidth: "1",
+                backgroundColor: "rgba(0, 194, 146, 0.5)",
+                pointHighlightStroke: "rgba(26,179,148,1)",
+                data: [ 16, 32, 18, 27, 42, 33, 44 ]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            tooltips: {
+              mode: 'index',
+              intersect: false
+            },
+            hover: {
+              mode: 'nearest',
+              intersect: true
+            }
+
+          }
+        } );
+
+
+        //bar chart
+        var ctx = document.getElementById( "barChart" );
+        //    ctx.height = 200;
+        var myChart = new Chart( ctx, {
+          type: 'bar',
+          data: {
+            labels: [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul" ],
+            datasets: [
+              {
+                label: "My First dataset",
+                data: [ 65, 59, 80, 81, 56, 55, 45 ],
+                borderColor: "rgba(0, 194, 146, 0.9)",
+                borderWidth: "0",
+                backgroundColor: "rgba(0, 194, 146, 0.5)"
+              },
+              {
+                label: "My Second dataset",
+                data: [ 28, 48, 40, 19, 86, 27, 76 ],
+                borderColor: "rgba(0,0,0,0.09)",
+                borderWidth: "0",
+                backgroundColor: "rgba(0,0,0,0.07)"
+              }
+            ]
+          },
+          options: {
+            scales: {
+              yAxes: [ {
+                ticks: {
+                  beginAtZero: true
+                }
+              } ]
+            }
+          }
+        } );
+
+        //radar chart
+        var ctx = document.getElementById( "radarChart" );
+        ctx.height = 160;
+        var myChart = new Chart( ctx, {
+          type: 'radar',
+          data: {
+            labels: [ [ "Eating", "Dinner" ], [ "Drinking", "Water" ], "Sleeping", [ "Designing", "Graphics" ], "Coding", "Cycling", "Running" ],
+            datasets: [
+              {
+                label: "My First dataset",
+                data: [ 65, 70, 66, 45, 5, 55, 40 ],
+                borderColor: "rgba(0, 194, 146, 0.6)",
+                borderWidth: "1",
+                backgroundColor: "rgba(0, 194, 146, 0.4)"
+              },
+              {
+                label: "My Second dataset",
+                data: [ 28, 5, 55, 19, 63, 27, 68 ],
+                borderColor: "rgba(0, 194, 146, 0.7",
+                borderWidth: "1",
+                backgroundColor: "rgba(0, 194, 146, 0.5)"
+              }
+            ]
+          },
+          options: {
+            legend: {
+              position: 'top'
+            },
+            scale: {
+              ticks: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+
+
+        //pie chart
+        var ctx = document.getElementById( "pieChart" );
+        ctx.height = 300;
+        var myChart = new Chart( ctx, {
+          type: 'pie',
+          data: {
+            datasets: [ {
+              data: [ 45, 25, 20, 10 ],
+              backgroundColor: [
+                "rgba(0, 194, 146,0.9)",
+                "rgba(0, 194, 146,0.7)",
+                "rgba(0, 194, 146,0.5)",
+                "rgba(0,0,0,0.07)"
+              ],
+              hoverBackgroundColor: [
+                "rgba(0, 194, 146,0.9)",
+                "rgba(0, 194, 146,0.7)",
+                "rgba(0, 194, 146,0.5)",
+                "rgba(0,0,0,0.07)"
+              ]
+
+            } ],
+            labels: [
+              "green",
+              "green",
+              "green"
+            ]
+          },
+          options: {
+            responsive: true
+          }
+        } );
+
+        //doughut chart
+        var ctx = document.getElementById( "doughutChart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'doughnut',
+          data: {
+            datasets: [ {
+              data: [ 35, 40, 20, 5 ],
+              backgroundColor: [
+                "rgba(0, 194, 146,0.9)",
+                "rgba(0, 194, 146,0.7)",
+                "rgba(0, 194, 146,0.5)",
+                "rgba(0,0,0,0.07)"
+              ],
+              hoverBackgroundColor: [
+                "rgba(0, 194, 146,0.9)",
+                "rgba(0, 194, 146,0.7)",
+                "rgba(0, 194, 146,0.5)",
+                "rgba(0,0,0,0.07)"
+              ]
+
+            } ],
+            labels: [
+              "green",
+              "green",
+              "green",
+              "green"
+            ]
+          },
+          options: {
+            responsive: true
+          }
+        } );
+
+        //polar chart
+        var ctx = document.getElementById( "polarChart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'polarArea',
+          data: {
+            datasets: [ {
+              data: [ 15, 18, 10, 7, 19],
+              backgroundColor: [
+                "rgba(0, 194, 146,0.9)",
+                "rgba(0, 194, 146,0.8)",
+                "rgba(0, 194, 146,0.7)",
+                "rgba(0,0,0,0.2)",
+                "rgba(0, 194, 146,0.5)"
+              ]
+
+            } ],
+            labels: [
+              "green",
+              "green",
+              "green",
+              "green"
+            ]
+          },
+          options: {
+            responsive: true
+          }
+        } );
+
+        // single bar chart
+        var ctx = document.getElementById( "singelBarChart" );
+        ctx.height = 150;
+        var myChart = new Chart( ctx, {
+          type: 'bar',
+          data: {
+            labels: [ "Sun", "Mon", "Tu", "Wed", "Th", "Fri", "Sat" ],
+            datasets: [
+              {
+                label: "My First dataset",
+                data: [ 55, 50, 75, 80, 56, 55, 60 ],
+                borderColor: "rgba(0, 194, 146, 0.9)",
+                borderWidth: "0",
+                backgroundColor: "rgba(0, 194, 146, 0.5)"
+              }
+            ]
+          },
+          options: {
+            scales: {
+              yAxes: [ {
+                ticks: {
+                  beginAtZero: true
+                }
+              } ]
+            }
+          }
+        } );
+      });
+      jQuery(document).ready(function($) {
+
+      });
+    </script>-->

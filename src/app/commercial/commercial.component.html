@@ -1,0 +1,226 @@
+<script src="https://cdn.jsdelivr.net/npm/chartist@0.11.0/dist/chartist.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+    .btn {
+        background-color: DodgerBlue;
+        border: none;
+        color: white;
+        padding: 3px 20px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+
+    /* Darker background on mouse-over */
+    .btn:hover {
+        background-color: RoyalBlue;
+    }
+</style>
+<div class="content">
+    <!-- Animated -->
+
+    <div class="orders">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="box-title" class="text-center">List des Reglements </h4>
+                    </div>
+                    <div class="card-body--">
+                        <mat-form-field fxFlex="40%">
+                            <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Chercher">
+                        </mat-form-field>
+                        <p>
+                            <button class="fa fa-download" class="btn" (click)="GenerateCSV()" style="float: center;"
+                                    style="font-size:16px">
+                                <i class="fa fa-download" aria-hidden="true"> </i> Telecharger detail
+                            </button>
+                        </p>
+                        <div class="table-stats order-table ov-h">
+                            <table mat-table #table [dataSource]="dataSource" matSort class="table">
+                                <!-- Id Column -->
+
+                                <ng-container matColumnDef="commercial">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> commercial</th>
+                                    <td mat-cell *matCellDef="let element"> {{element.commercial}} </td>
+                                </ng-container>
+
+                                <!-- Title Column -->
+                                <ng-container matColumnDef="mntRegler">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> mntRegler</th>
+                                    <td mat-cell *matCellDef="let element"> {{element.mntRegler}} </td>
+                                </ng-container>
+
+                                <!-- Category Column -->
+                                <ng-container matColumnDef="dateDocument">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> dateDocument</th>
+                                    <td mat-cell *matCellDef="let element"> {{element.dateDocument}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="codeArticle">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> versement</th>
+                                    <td mat-cell *matCellDef="let element"> {{element.versement}} </td>
+                                </ng-container>
+
+                                <ng-container matColumnDef="libelleArticle">
+                                    <th mat-header-cell *matHeaderCellDef mat-sort-header> libelleArticle</th>
+                                    <td mat-cell *matCellDef="let element"> {{element.libelleArticle}} </td>
+                                </ng-container>
+
+                                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                                <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                            </table>
+                            <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+                        </div> <!-- /.table-stats -->
+                    </div>
+                </div> <!-- /.card -->
+            </div>  <!-- /.col-lg-8 -->
+
+
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <p> &nbsp;&nbsp; choisir 2 dates et un(e) Commercial(e)</p>
+                <div>
+                    <form [formGroup]="filterform">
+                        <select formControlName="date1">
+                            <option *ngFor="let dt of ChartComercialDate" value={{dt.dateDocument}}>
+                                {{dt.dateDocument}}
+                            </option>
+                        </select>&nbsp;
+                        <select formControlName="date2">
+                            <option *ngFor="let dt of ChartComercialDate" value={{dt.dateDocument}}>
+                                {{dt.dateDocument}}
+                            </option>
+                        </select>&nbsp;
+                        <select formControlName="commercial">
+                            <option *ngFor="let com of ChartDistinctComercial" value={{com.commercial}}>
+                                {{com.commercial}}
+                            </option>
+                        </select>&nbsp;
+                        <button (click)="getChartComercialDetail()"
+                                [disabled]="filterform.controls.date1.value > filterform.controls.date2.value"
+                                class="btn btn-primary">
+                            <i class="fa fa-download" aria-hidden="true"></i> &nbsp;Generer detail Commercial
+                            &nbsp;<i class="fa fa-user" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                    <!-- <br>
+                     &nbsp;&nbsp;<button class="btn btn-info" (click)="getChartComercialDetail()">
+                     <i class="fa fa-download" aria-hidden="true"> </i>&nbsp; Exporter le Rapport+
+                   </button>-->
+                </div>
+
+                <div class="card-body">
+                    <h4 class="mb-3"></h4>
+
+                    <canvas id="ChartComercial" style="height: 400px; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="orders">
+       <div class="row">
+         <div class="col-xl-12">
+           <div class="card">
+             <div class="card-body" >
+               <h4 class="box-title"class="text-center">MvDocuments Non regler </h4>
+             </div>
+             <div class="card-body&#45;&#45;" >
+               <mat-form-field fxFlex="40%">
+                 <input matInput type="text" (keyup)="doFilter($event.target.value)" placeholder="Filtrer">
+               </mat-form-field><p>
+               <button class="fa fa-download"   class="btn"(click)="GenerateCSV()" style="float: center;">Telecharger detail</button>
+             </p>
+               <div class="table-stats order-table ov-h">
+                 <table mat-table #table [dataSource]="dataSource" matSort class="table">
+                   &lt;!&ndash; Id Column &ndash;&gt;
+
+                   <ng-container matColumnDef="commercial">
+                     <th mat-header-cell *matHeaderCellDef mat-sort-header> commercial </th>
+                     <td mat-cell *matCellDef="let element"> {{element.commercial}} </td>
+                   </ng-container>
+
+                   &lt;!&ndash; Title Column &ndash;&gt;
+                   <ng-container matColumnDef="mntRegler">
+                     <th mat-header-cell *matHeaderCellDef mat-sort-header> mntRegler </th>
+                     <td mat-cell *matCellDef="let element"> {{element.mntRegler}} </td>
+                   </ng-container>
+
+                   &lt;!&ndash; Category Column &ndash;&gt;
+                   <ng-container matColumnDef="dateDocument">
+                     <th mat-header-cell *matHeaderCellDef mat-sort-header> Prix dateDocument </th>
+                     <td mat-cell *matCellDef="let element"> {{element.dateDocument}} </td>
+                   </ng-container>
+
+                   <ng-container matColumnDef="codeArticle">
+                     <th mat-header-cell *matHeaderCellDef mat-sort-header> codeArticle </th>
+                     <td mat-cell *matCellDef="let element"> {{element.codeArticle}} </td>
+                   </ng-container>
+
+                   <ng-container matColumnDef="libelleArticle">
+                     <th mat-header-cell *matHeaderCellDef mat-sort-header> libelleArticle </th>
+                     <td mat-cell *matCellDef="let element"> {{element.libelleArticle}} </td>
+                   </ng-container>
+
+                   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                   <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                 </table>
+                 <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+               </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+             </div>
+           </div> &lt;!&ndash; /.card &ndash;&gt;
+         </div>  &lt;!&ndash; /.col-lg-8 &ndash;&gt;
+
+         &lt;!&ndash; <div class="col-xl-4">
+            <div class="row">
+              <div class="col-lg-6 col-xl-12">
+                <div class="card br-0">
+                  <div class="card-body">
+                    <h5 class="box-title" class="text-center">Top 14 Best Client </h5>
+                    <div class="card-body">
+                      <div class="table-stats order-table ov-h">
+                        <table class="table ">
+                          <thead>
+                          <tr>
+                            <th>Nom Client</th>
+                            <th>Montant</th>
+                          </tr>
+                          </thead>
+                          <tbody>
+                          <tr *ngFor="let topC of TopClient">
+                            <td>{{ topC.client}}</td>
+                            <td>{{ topC.montant }}</td>
+
+                          </tr>
+                          </tbody>
+                        </table>
+                      </div> &lt;!&ndash; /.table-stats &ndash;&gt;
+
+                    </div>
+                  </div>&lt;!&ndash; /.card &ndash;&gt;
+                </div>
+
+                <div class="col-lg-6 col-xl-12">
+                  <div class="card bg-flat-color-3  ">
+                    &lt;!&ndash;<div class="card-body">
+                      <h4 class="card-title m-0  white-color ">August 2018</h4>
+                    </div>
+                    <div class="card-body">
+                      <div id="flotLine5" class="flot-line"></div>
+                    </div>&ndash;&gt;
+                  </div>
+                </div>
+              </div>
+            </div> &lt;!&ndash; /.col-md-4 &ndash;&gt;
+          </div>&ndash;&gt;
+       </div>
+
+     </div>-->
+
+</div>
+<script src="assets/js/main.js"></script>
+
